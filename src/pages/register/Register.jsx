@@ -4,6 +4,8 @@ import { useHistory, Link } from "react-router-dom";
 import axios from "axios";
 
 export default function Register() {
+    
+const reactbaseUrl = process.env.REACT_APP_BASE_URL;
   const usernameRef = useRef("");
   const emailRef = useRef("");
   const passwordRef = useRef("");
@@ -24,7 +26,7 @@ export default function Register() {
 
        console.log(user);
       try {
-        await axios.post("/auth/register", user);
+        await axios.post(`${reactbaseUrl}/auth/register`, user);
         history.push("/login");
       } catch (err) {
         console.log(err);

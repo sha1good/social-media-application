@@ -6,7 +6,7 @@ import axios from "axios";
 import { AuthContext } from "../../context/AuthContext";
 
 const Post = ({ post }) => {
-  console.log(post)
+  const reactbaseUrl = process.env.REACT_APP_BASE_URL;
   const [liked, setLiked] = useState(post.likes.length);
   const [isLiked, setIsLiked] = useState(false);
   const [user, setUser] = useState({});
@@ -20,15 +20,15 @@ const Post = ({ post }) => {
 
   useEffect(() => {
     const fetchUser = async () => {
-      const response = await axios.get(`/users?userId=${post.userId}`);
+      const response = await axios.get(`${reactbaseUrl}/users?userId=${post.userId}`);
       setUser(response.data);
     };
     fetchUser();
-  }, [post.userId]);
+  }, [post.userId,reactbaseUrl]);
 
   const likedHandler = () => {
     try {
-      axios.put("/posts/" + post._id + "/like", { userId: currentUser._id });
+      axios.put(`${reactbaseUrl}/posts/` + post._id + "/like", { userId: currentUser._id });
     } catch (err) {}
     setLiked(isLiked ? liked - 1 : liked + 1);
     setIsLiked(!isLiked);

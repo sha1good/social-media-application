@@ -9,6 +9,7 @@ import axios from "axios";
 
 const RightBar = ({ user }) => {
   const PF = process.env.REACT_APP_PUBLIC_FOLDER;
+  const reactbaseUrl = process.env.REACT_APP_BASE_URL;
   const { user: currentUser, dispatch } = useContext(AuthContext);
   const [followed, setFollowed] = useState(
     currentUser.followings.includes(user?._id)
@@ -18,24 +19,24 @@ const RightBar = ({ user }) => {
   useEffect(() => {
     const getFriends = async () => {
       try {
-        const response = await axios.get("/users/friends/" + user?._id);
+        const response = await axios.get(`${reactbaseUrl}/users/friends/` + user?._id);
         setFriends(response.data);
       } catch (error) {
         console.log(error);
       }
     };
     getFriends();
-  }, [user]);
+  }, [user,reactbaseUrl]);
 
   const handleFollowHandler = async () => {
     try {
       if (followed) {
-        await axios.put(`/users/${user._id}/unfollow`, {
+        await axios.put(`${reactbaseUrl}/users/${user._id}/unfollow`, {
           userId: currentUser._id,
         });
         dispatch({ type: "UNFOLLOW", payload: user._id });
       } else {
-        await axios.put(`/users/${user._id}/follow`, {
+        await axios.put(`${reactbaseUrl}/users/${user._id}/follow`, {
           userId: currentUser._id,
         });
         dispatch({ type: "FOLLOW", payload: user._id });

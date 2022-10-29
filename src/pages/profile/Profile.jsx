@@ -12,13 +12,15 @@ const Profile = () => {
   const username = useParams().username;
     const [user, setUser] = useState({});
 
+    const reactbaseUrl = process.env.REACT_APP_BASE_URL;
+
    useEffect(() => {
          const fetchUser = async () =>{
-            const response = await axios.get(`/users?username=${username}`);
+            const response = await axios.get(`${reactbaseUrl}/users?username=${username}`);
             setUser(response.data);
          };
        fetchUser();  
-   }, [username]) 
+   }, [username,reactbaseUrl]) 
 
     return (
     <React.Fragment>

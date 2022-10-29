@@ -7,6 +7,7 @@ import axios from "axios";
 const Share = () => {
   const { user } = useContext(AuthContext);
   const PF = process.env.REACT_APP_PUBLIC_FOLDER;
+  const reactbaseUrl = process.env.REACT_APP_BASE_URL;
   const desc = useRef();
   const [file, setFile] = useState(null);
 
@@ -25,11 +26,11 @@ const Share = () => {
            newPost.img= fileName;
            console.log(newPost);
          try{
-            await axios.post("/upload", data)
+            await axios.post(`${reactbaseUrl}/upload`, data)
          }catch(err){}  
        }
        try{
-          await axios.post("/posts", newPost);
+          await axios.post(`${reactbaseUrl}/posts`, newPost);
            window.location.reload();
        }catch(err){}
 
