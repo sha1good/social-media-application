@@ -1,48 +1,80 @@
 import "./post.css";
 import { MoreVert } from "@material-ui/icons";
-import { Users } from "../../dummyData";
-import { useState } from "react";
+import { useEffect, useState, useContext } from "react";
+import  { format } from "timeago.js";
+import axios from "axios";
+import { AuthContext } from "../../context/AuthContext";
 
-const Post = ({post}) => {
+const Post = ({ post }) => {
+  console.log(post)
+  const [liked, setLiked] = useState(post.likes.length);
+  const [isLiked, setIsLiked] = useState(false);
+  const [user, setUser] = useState({});
+  const PF = process.env.REACT_APP_PUBLIC_FOLDER;
 
-   const [liked, setLiked] = useState(post.like);
-   const [isLiked, setIsLiked] =  useState(false);
+  const { user: currentUser } = useContext(AuthContext);
 
-    const likedHandler = () =>{
-       setLiked(isLiked ? liked - 1 : liked + 1);
-       setIsLiked((prevState) => !prevState);
-    }
+  useEffect(() => {
+    setIsLiked(post.likes.includes(currentUser._id));
+  }, [post.likes, currentUser._id]);
 
-  return (
+  useEffect(() => {
+    const fetchUser = async () => {
+      const response = await axios.get(`/users?userId=${post.userId}`);
+      setUser(response.data);
+    };
+    fetchUser();
+  }, [post.userId]);
+
+  const likedHandler = () => {
+    try {
+      axios.put("/posts/" + post._id + "/like", { userId: currentUser._id });
+    } catch (err) {}
+    setLiked(isLiked ? liked - 1 : liked + 1);
+    setIsLiked(!isLiked);
+  };
+ return (
     <div className="post">
       <div className="postWrapper">
         <div className="postTop">
           <div className="postTopLeft">
             <img
               className="postProfileImg"
-              src={Users.filter((u) => u.id === post?.userId)[0].profilePicture}
+              src={
+                user.profilePicture
+                  ? PF + user.profilePicture
+                  : PF + "person/noAvatar.png"
+              }
               alt=""
             />
-            <span className="postUsername">
-              {Users.filter((u) => u.id === post?.userId)[0].username}
-            </span>
-            <span className="postDate">{post.date}</span>
+            <span className="postUsername">{user.username}</span>
+            <span className="postDate">{format(post.createdAt)}</span>
           </div>
           <div className="postTopRight">
             <MoreVert />
           </div>
         </div>
         <div className="postCenter">
-           <span className="postText">{post?.desc}</span>
-           <img src={post.photo}  alt=""  className="postImg"/>
+          <span className="postText">{post?.desc}</span>
+          <img src={PF + post.img} alt="" className="postImg" />
         </div>
         <div className="postBottom">
-            <div className="postBottomLeft">
-                <img  className="likeIcon" alt="" src="/assets/like.png" onClick={likedHandler}/>
-                <img  className="likeIcon" alt="" src="/assets/heart.png" onClick={likedHandler}/>
-                <span className="postLikeCounter">{liked} people like it</span>
-            </div>
-            <div className="postBottomRight">Comment</div>
+          <div className="postBottomLeft">
+            <img
+              className="likeIcon"
+              alt=""
+              src="/assets/like.png"
+              onClick={likedHandler}
+            />
+            <img
+              className="likeIcon"
+              alt=""
+              src="/assets/heart.png"
+              onClick={likedHandler}
+            />
+            <span className="postLikeCounter">{liked} people like it</span>
+          </div>
+          <div className="postBottomRight">Comment</div>
         </div>
       </div>
     </div>
